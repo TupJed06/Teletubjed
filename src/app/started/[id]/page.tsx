@@ -9,7 +9,7 @@ import { useTimerContext } from '@/context/TimerContext';
 import { useTimer } from '@/hooks/useTimer';
 import { formatTime } from '@/utils/timeFormat';
 import { database } from '@/libs/firebaseClient';
-import { ref, onValue } from "firebase/database";
+import { ref, onValue,update } from "firebase/database";
 import stopSession from '@/libs/History/stopSession'; 
 import updateHistory from '@/libs/History/updateHistory';
 
@@ -34,9 +34,15 @@ export default function StartedPage({ params }: { params: { id: string } }) {
     focusTime: currentSettings.focusTime,
     relaxTime: currentSettings.relaxTime,
     repeatEnabled: currentSettings.repeatEnabled,
-    onComplete: () => handleAutoStop(), 
+    onComplete: () => handleManualStop(), 
   });
 
+  useEffect(() => {
+    const sessionRef = ref(database, 'session_data');
+        update(sessionRef, {
+            is_relax: isRelaxPhase,
+        }).catch((err) => console.error("Error:", err));
+  }, [isRelaxPhase]);
   useEffect(() => {
     const sensorsRef = ref(database, 'session_data');
     const unsubscribe = onValue(sensorsRef, (snapshot) => {
@@ -60,17 +66,17 @@ export default function StartedPage({ params }: { params: { id: string } }) {
     }
   }, [status, start]);
 
-  const handleAutoStop = async () => {
-    const payload = {
-      focusTime: currentSettings.focusTime,
-      relaxTime: 0,
-      totalRound: 1,
-    };
+  // const handleAutoStop = async () => {
+  //   const payload = {
+  //     focusTime: currentSettings.focusTime,
+  //     relaxTime: 0,
+  //     totalRound: 1,
+  //   };
 
-    await updateHistory(params.id);
-    await stopSession(params.id, payload);
-    router.push('/');
-  };
+  //   await updateHistory(params.id);
+  //   await stopSession(params.id, payload);
+  //   router.push('/');
+  // };
 
   const handleManualStop = async () => {
     stop(); 
@@ -133,7 +139,7 @@ export default function StartedPage({ params }: { params: { id: string } }) {
               <div className="p-6 rounded-3xl shadow-lg bg-white border-l-4 border-red-500 flex flex-col items-center justify-center">
                 <h2 className="text-red-400 text-sm uppercase tracking-widest mb-2">Temperature</h2>
                 <div className="text-5xl font-bold text-red-400">
-                  {data.sensors && data.sensors.temp ? Math.round(data.sensors.temp) : "--"}
+                  {data.sensors && data.sensors.temp ? (data.sensors.temp.toFixed(1)) : "--"}
                   <span className="text-2xl text-gray-400 ml-1">°C</span>
                 </div>
               </div>
@@ -141,7 +147,7 @@ export default function StartedPage({ params }: { params: { id: string } }) {
               <div className="p-6 rounded-3xl shadow-lg bg-white border-l-4 border-blue-500 flex flex-col items-center justify-center">
                 <h2 className="text-blue-400 text-sm uppercase tracking-widest mb-2">Humidity</h2>
                 <div className="text-5xl font-bold text-blue-400">
-                  {data.sensors && data.sensors.humidity ? Math.round(data.sensors.humidity) : "--"}
+                  {data.sensors && data.sensors.humidity ? (data.sensors.humidity.toFixed(1)) : "--"}
                   <span className="text-2xl text-gray-400 ml-1">%</span>
                 </div>
               </div>
@@ -149,7 +155,7 @@ export default function StartedPage({ params }: { params: { id: string } }) {
               <div className="p-6 rounded-3xl shadow-lg bg-white border-l-4 border-yellow-500 flex flex-col items-center justify-center">
                 <h2 className="text-yellow-400 text-sm uppercase tracking-widest mb-2">Light</h2>
                 <div className="text-5xl font-bold text-yellow-400">
-                  {data.sensors && data.sensors.light ? Math.round(data.sensors.light) : "--"}
+                  {data.sensors && data.sensors.light ? (data.sensors.light.toFixed(1)) : "--"}
                   <span className="text-2xl text-gray-400 ml-1">%</span>
                 </div>
               </div>

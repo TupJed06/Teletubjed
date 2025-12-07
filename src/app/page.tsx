@@ -64,11 +64,11 @@ export default function HomePage() {
   // ----------------------------------------------------------------
   useEffect(() => {
     const sessionRef = ref(database, 'session_data');
-    setTimeout(()=>{},500)
+    setTimeout(()=>{},1000)
     const unsubscribe = onValue(sessionRef, (snapshot) => {
       const val = snapshot.val();
 
-      if (val && val.active_history_id && !isCalibrating && !targetHistoryId) {;
+      if (val && val.active_history_id && !isCalibrating && !targetHistoryId && val.command === "START" ) {
          if (val.status === "CALIBRATING") {
              setTargetHistoryId(val.active_history_id);
              setCountdown(10); 
@@ -79,7 +79,7 @@ export default function HomePage() {
             repeatEnabled: val.relaxTime? true : false
           });
          }
-         else if (val.command === "START" && val.status === "RUNNING") {
+         else if (val.status === "RUNNING") {
              router.push(`/started/${val.active_history_id}`);
          }
       }
@@ -111,7 +111,6 @@ export default function HomePage() {
       });
 
       if (session.success) {
-        // ✅ Manual start also triggers the same UI state
         setTargetHistoryId(session.data._id);
         setCountdown(10);
         setIsCalibrating(true);
@@ -129,7 +128,6 @@ export default function HomePage() {
         setCountdown((prev) => prev - 1);
       }, 1000);
     } else if (isCalibrating && countdown === 0 && targetHistoryId) {
-      // ✅ Countdown Finished -> GO TO STARTED PAGE
       router.push(`/started/${targetHistoryId}`);
     }
     return () => clearInterval(timer);
