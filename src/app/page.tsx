@@ -69,15 +69,15 @@ export default function HomePage() {
       const val = snapshot.val();
 
       if (val && val.active_history_id && !isCalibrating && !targetHistoryId && val.command === "START" ) {
-         if (val.status === "CALIBRATING") {
-             setTargetHistoryId(val.active_history_id);
-             setCountdown(10); 
-             setIsCalibrating(true);
-             setCurrentSettings({
+          setCurrentSettings({
             focusTime: val.timer_duration,
             relaxTime: val.relaxTime,
             repeatEnabled: val.relaxTime? true : false
           });
+         if (val.status === "CALIBRATING") {
+             setTargetHistoryId(val.active_history_id);
+             setCountdown(10); 
+             setIsCalibrating(true);
          }
          else if (val.status === "RUNNING") {
              router.push(`/started/${val.active_history_id}`);
