@@ -89,8 +89,12 @@ export default function HomePage() {
 
   // 3. LOGIC: Auto-Save (Same as before)
   const handleSettingChange = async (field: string, value: any) => {
-    // ... (Your existing auto-save code)
     const newSettings = { ...settings, [field]: value };
+    await updateFocus(ID, { 
+        focusTime: Number(newSettings.focusTime),
+        relaxTime: newSettings.repeatEnabled ? Number(newSettings.relaxTime): 0,
+        repeatOn: newSettings.repeatEnabled 
+      });
     setSettings(newSettings);
     setCurrentSettings({
       focusTime: newSettings.focusTime,
