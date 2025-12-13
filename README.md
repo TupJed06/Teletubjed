@@ -74,13 +74,7 @@ npm install
 
 ### 3\. Configure Environment
 
-Create a `.env` file in the root directory to connect to your backend.
-
-```env
-PORT = 5000
-NODE_ENV = development
-DATABASE_URI =  yourDatabaseURL
-```
+Create a `.env` file in backend and frontend
 
 -----
 
